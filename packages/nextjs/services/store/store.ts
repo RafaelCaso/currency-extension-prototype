@@ -2,15 +2,6 @@ import create from "zustand";
 import scaffoldConfig from "~~/scaffold.config";
 import { ChainWithAttributes } from "~~/utils/scaffold-eth";
 
-/**
- * Zustand Store
- *
- * You can add global state to the app using this useGlobalState, to get & set
- * values from anywhere in the app.
- *
- * Think about it as a global useState.
- */
-
 type GlobalState = {
   nativeCurrency: {
     price: number;
@@ -20,6 +11,10 @@ type GlobalState = {
   setIsNativeCurrencyFetching: (newIsNativeCurrencyFetching: boolean) => void;
   targetNetwork: ChainWithAttributes;
   setTargetNetwork: (newTargetNetwork: ChainWithAttributes) => void;
+  appCurrencySymbol: string;
+  setAppCurrencySymbol: (newCurrency: string) => void;
+  appCurrencyValue: number;
+  setAppCurrencyValue: (newValue: number) => void;
 };
 
 export const useGlobalState = create<GlobalState>(set => ({
@@ -33,4 +28,18 @@ export const useGlobalState = create<GlobalState>(set => ({
     set(state => ({ nativeCurrency: { ...state.nativeCurrency, isFetching: newValue } })),
   targetNetwork: scaffoldConfig.targetNetworks[0],
   setTargetNetwork: (newTargetNetwork: ChainWithAttributes) => set(() => ({ targetNetwork: newTargetNetwork })),
+  appCurrencySymbol: "USD",
+  setAppCurrencySymbol: (newCurrencySymbol: string) => set(() => ({ appCurrencySymbol: newCurrencySymbol })),
+  appCurrencyValue: 1,
+  setAppCurrencyValue: (newValue: number) =>
+    set(state => {
+      const { nativeCurrency } = state;
+      return {
+        appCurrencyValue: newValue,
+        nativeCurrency: {
+          ...nativeCurrency,
+          price: nativeCurrency.price * (newValue / (state.appCurrencyValue || 1)),
+        },
+      };
+    }),
 }));
