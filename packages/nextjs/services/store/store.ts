@@ -15,6 +15,10 @@ type GlobalState = {
   setAppCurrencySymbol: (newCurrency: string) => void;
   appCurrencyValue: number;
   setAppCurrencyValue: (newValue: number) => void;
+  conversionRates: { [symbol: string]: number };
+  setConversionRates: (newRates: { [symbol: string]: number }) => void;
+  nextUpdate: number | null;
+  setNextUpdate: (newNextUpdate: number | null) => void;
 };
 
 export const useGlobalState = create<GlobalState>(set => ({
@@ -42,4 +46,8 @@ export const useGlobalState = create<GlobalState>(set => ({
         },
       };
     }),
+  conversionRates: {},
+  setConversionRates: (newRates: { [symbol: string]: number }) => set(() => ({ conversionRates: newRates })),
+  nextUpdate: null,
+  setNextUpdate: (newNextUpdate: number | null) => set(() => ({ nextUpdate: newNextUpdate })),
 }));
