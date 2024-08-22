@@ -11,7 +11,6 @@ const Currency = () => {
 
   const appCurrencySymbol = useGlobalState(state => state.appCurrencySymbol);
   const setAppCurrencySymbol = useGlobalState(state => state.setAppCurrencySymbol);
-  const appCurrencyValue = useGlobalState(state => state.appCurrencyValue);
   const setAppCurrencyValue = useGlobalState(state => state.setAppCurrencyValue);
 
   const handleSubmit = async () => {
@@ -32,11 +31,9 @@ const Currency = () => {
 
       setAppCurrencyValue(newCurrencyValue);
       setFeedback(`App currency has been changed to ${appCurrencySymbol}`);
-      console.log("Currency symbol:", appCurrencySymbol);
-      console.log("Currency value:", appCurrencyValue);
     } catch (error) {
       console.error(error);
-      setFeedback("Error: check terminal");
+      setFeedback("Something went wrong, please try again");
     }
   };
 
