@@ -2,13 +2,12 @@
 
 import { useState } from "react";
 import { useGlobalState } from "~~/services/store/store";
+import { notification } from "~~/utils/scaffold-eth";
 import { validCurrencySymbols } from "~~/utils/scaffold-eth/currencySymbols";
 
 const API_KEY = process.env.NEXT_PUBLIC_CURRENCY_API_KEY;
 
 const Currency = () => {
-  const [feedback, setFeedback] = useState("");
-
   const conversionRates = useGlobalState(state => state.conversionRates);
   const nextUpdate = useGlobalState(state => state.nextUpdate);
   const setConversionRates = useGlobalState(state => state.setConversionRates);
@@ -36,20 +35,23 @@ const Currency = () => {
   };
 
   const handleSubmit = async () => {
+    setInputValue("");
+    setSuggestions([]);
     // validate input currency symbol before updating
     if (!validCurrencySymbols.includes(appCurrencySymbol)) {
-      setFeedback("Invalid Currency Symbol");
+      notification.error("Invalid currency symbol");
       return;
     }
 
     // get current Unix timestamp to check if API update required
     const now = Math.floor(Date.now() / 1000);
-    // if this is the first time calling API or if update is available, call API
+    // if this is the first time calling API, or if update is available, call API
     if (nextUpdate === null || nextUpdate < now) {
       try {
         const response = await fetch(`https://v6.exchangerate-api.com/v6/${API_KEY}/latest/USD`);
 
         if (!response.ok) {
+          notification.error("Failed to fetch conversion rates");
           throw new Error("Network did not respond");
         }
 
@@ -57,16 +59,16 @@ const Currency = () => {
         setNextUpdate(data.time_next_update_unix);
         setConversionRates(data.conversion_rates);
         setAppCurrencyValue(data.conversion_rates[appCurrencySymbol]);
-        setFeedback(`App currency has been changed to ${appCurrencySymbol}`);
+        notification.success(`Currency changed to ${appCurrencySymbol}`);
       } catch (error) {
-        console.error(error);
-        setFeedback("Something went wrong, please try again");
+        notification.error("Something went wrong, please try again");
+        throw new Error("Failed to process API response");
       }
     }
     // if no update is available, use cached data
     else {
       setAppCurrencyValue(conversionRates[appCurrencySymbol]);
-      setFeedback(`App currency has been changed to ${appCurrencySymbol}`);
+      notification.success(`Currency changed to ${appCurrencySymbol}`);
     }
   };
 
@@ -79,7 +81,7 @@ const Currency = () => {
           </div>
           <div className="card-body">
             <div>
-              <input type="text" value={inputValue} onChange={handleInputChange} placeholder="Type currency symbol" />
+              <input type="text" value={inputValue} onChange={handleInputChange} />
               {suggestions.length > 0 && (
                 <ul className="suggestions-list">
                   {suggestions.map(symbol => (
@@ -101,7 +103,6 @@ const Currency = () => {
             <button className="btn bg-secondary" onClick={handleSubmit}>
               Submit
             </button>
-            {feedback && <p>{feedback}</p>}
           </div>
         </div>
       </div>

@@ -11,12 +11,17 @@ type GlobalState = {
   setIsNativeCurrencyFetching: (newIsNativeCurrencyFetching: boolean) => void;
   targetNetwork: ChainWithAttributes;
   setTargetNetwork: (newTargetNetwork: ChainWithAttributes) => void;
+
+  // 3 letter symbol denoting currency (USD, BGP, CNY etc.)
   appCurrencySymbol: string;
   setAppCurrencySymbol: (newCurrency: string) => void;
+  // Conversion rate (USD to Selected Currency)
   appCurrencyValue: number;
   setAppCurrencyValue: (newValue: number) => void;
+  // JSON of all conversion rates (Symbol/ConversionRate key/value pair)
   conversionRates: { [symbol: string]: number };
   setConversionRates: (newRates: { [symbol: string]: number }) => void;
+  // Unix timestamp of when API will have new conversion rates
   nextUpdate: number | null;
   setNextUpdate: (newNextUpdate: number | null) => void;
 };
